@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Burrito Cloud</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://fonts.googleapis.com/css?family=Nunito:400,300' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" th:href="@{/styles.css}"/>
+</head>
+
+<body>
+
+
+<div class="aligncenter">
+    <img th:src="@{/images/BurritoCloud_borderless.png}">
+</div>
+<div>
+    <form method="POST" th:action="@{/orders}" th:object="${order}" class="twoCol">
+        <div class="row">
+            <div class="leftCell"><h3>Delivery details</h3></div>
+            <div class="rightCell"><h3>Payment Details</h3></div>
+
+        </div>
+
+        <div class="row">
+            <div class="leftCell">
+                <label for="name">Name:</label>
+                <input type="text" id="name" th:field="*{name}" th:classappend="${#fields.hasErrors('name')} ? invalid : valid"/>
+            </div>
+
+            <div class="rightCell">
+                <label for="creditCardNo">Credit Card No:</label>
+                <input type="text" id="creditCardNo" th:field="*{creditCardNo}" th:classappend="${#fields.hasErrors('creditCardNo')} ? invalid : valid"/>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="leftCell">
+                <label for="street">Street:</label>
+                <input type="text" id="street" th:field="*{street}" th:classappend="${#fields.hasErrors('street')} ? invalid : valid"/>
+                <span class ="validationError" th:if="${#fields.hasErrors('street')}" th:errors="*{street}">Name error</span>
+            </div>
+
+            <div class="rightCell">
+                <label for="creditCardExpiryDate">Expiration:</label>
+                <input type="text" id="creditCardExpiryDate" th:field="*{creditCardExpiryDate}" th:classappend="${#fields.hasErrors('creditCardExpiryDate')} ? invalid : valid"/>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="leftCell">
+                <label for="town">Town:</label>
+                <input type="text" id="town" th:field="*{town}" th:classappend="${#fields.hasErrors('town')} ? invalid : valid"/>
+            </div>
+
+            <div class="rightCell">
+                <label for="creditCardCCV">CCV:</label>
+                <input type="text" id="creditCardCCV" th:field="*{creditCardCCV}" th:classappend="${#fields.hasErrors('creditCardCCV')} ? invalid : valid"/>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="leftCell">
+                <label for="county">County:</label>
+                <input type="text" id="county" th:field="*{county}" th:classappend="${#fields.hasErrors('county')} ? invalid : valid"/>
+            </div>
+            <div class="rightCell">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="leftCell">
+                <label for="postcode">Postcode:</label>
+                <input type="text" id="postcode" th:field="*{postcode}" th:classappend="${#fields.hasErrors('postcode')} ? invalid : valid"/>
+            </div>
+            <div class="rightCell">
+            </div>
+        </div>
+
+        <div th:if="${#fields.hasErrors()}">
+            <span class="validationError">Please complete the highlighted fields</span>
+        </div>
+
+        <br/>
+
+        <button>Submit order</button>
+    </form>
+</div>
+</body>
+
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Burrito Cloud</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://fonts.googleapis.com/css?family=Nunito:400,300' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" th:href="@{/styles.css}"/>
+</head>
+
+<body>
+<div class="header">
+</div>
+
+<div class="aligncenter">
+    <img th:src="@{/images/BurritoCloud_borderless.png}">
+</div>
+
+<div>
+        <form method="POST" th:object="${design}">
+
+        <h3>Choose your wrap</h3>
+        <div th:each="ingredient : ${wrap}">
+            <input name="ingredients" type="checkbox" th:value="${ingredient.id}"/>
+            <span th:text="${ingredient.name}">INGREDIENT</span><br/>
+        </div>
+
+        <h3>Choose your meat</h3>
+        <div th:each="ingredient : ${meat}">
+            <input name="ingredients" type="checkbox" th:value="${ingredient.id}"/>
+            <span th:text="${ingredient.name}">INGREDIENT</span><br/>
+        </div>
+
+        <h3>Choose your vegetables</h3>
+        <div th:each="ingredient : ${vegetable}">
+            <input name="ingredients" type="checkbox" th:value="${ingredient.id}"/>
+            <span th:text="${ingredient.name}">INGREDIENT</span><br/>
+        </div>
+
+        <h3>Choose your sauce</h3>
+        <div th:each="ingredient : ${sauce}">
+            <input name="ingredients" type="checkbox" th:value="${ingredient.id}"/>
+            <span th:text="${ingredient.name}">INGREDIENT</span><br/>
+        </div>
+
+        <h3>Name your creation:</h3>
+        <input type="text" th:field="*{name}"/>
+        <br/>
+
+        <button>Select design</button>
+
+        </form>
+</div>
+</body>
+
+</html>
