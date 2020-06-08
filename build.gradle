@@ -10,14 +10,16 @@ repositories {
 }
 
 dependencies {
+    compile group: 'com.h2database', name: 'h2', version: h2Version
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc', version: springBootVersion
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf', version: springBootVersion
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: springBootVersion
-    compile group: 'org.projectlombok', name: 'lombok', version: lombokVersion
     developmentOnly group: 'org.springframework.boot', name: 'spring-boot-devtools', version: springBootVersion
 
-    compile group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
+    compile group: 'javax.validation', name: 'validation-api', version: validationApiVersion
     compile group: 'org.hibernate', name: 'hibernate-validator', version: hibernateValidatorVersion
     compile group: 'org.hibernate', name: 'hibernate-validator-annotation-processor', version: hibernateValidatorVersion
+    compile group: 'org.projectlombok', name: 'lombok', version: lombokVersion
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBootVersion
 //    testCompile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '3.141.59'
