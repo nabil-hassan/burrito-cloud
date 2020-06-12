@@ -1,8 +1,8 @@
-package net.nh.burrito.repository;
+package net.nh.burrito.repository.jdbc;
 
 import net.nh.burrito.entity.Ingredient;
+import net.nh.burrito.repository.IngredientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -19,9 +19,10 @@ public class JdbcIngredientRepository implements IngredientRepository {
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
     @Autowired
-    public JdbcIngredientRepository(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
+    public JdbcIngredientRepository(NamedParameterJdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
+
 
     @Override
     public List<Ingredient> findAll() {

@@ -1,19 +1,18 @@
-package net.nh.burrito.repository;
+package net.nh.burrito.repository.jdbc;
 
 import lombok.extern.slf4j.Slf4j;
 import net.nh.burrito.entity.Burrito;
+import net.nh.burrito.repository.BurritoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.PreparedStatementCreatorFactory;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
+import javax.sql.DataSource;
 import java.sql.Timestamp;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -24,9 +23,9 @@ public class JdbcBurritoRepository implements BurritoRepository {
     private final SimpleJdbcInsert simpleJdbcInsert;
 
     @Autowired
-    public JdbcBurritoRepository(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
-        this.simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate.getDataSource()).withTableName("burrito").usingGeneratedKeyColumns("id");
+    public JdbcBurritoRepository(NamedParameterJdbcTemplate jdbcTemplate, DataSource dataSource) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.simpleJdbcInsert = new SimpleJdbcInsert(dataSource).withTableName("burrito").usingGeneratedKeyColumns("id");
     }
 
     @Override
