@@ -24,8 +24,8 @@
 
         <div class="row">
             <div class="leftCell">
-                <label for="name">Name:</label>
-                <input type="text" id="name" th:field="*{name}" th:classappend="${#fields.hasErrors('name')} ? invalid : valid"/>
+                <label for="orderName">Name:</label>
+                <input type="text" id="orderName" th:field="*{orderName}" th:classappend="${#fields.hasErrors('orderName')} ? invalid : valid"/>
             </div>
 
             <div class="rightCell">
@@ -43,7 +43,7 @@
 
             <div class="rightCell">
                 <label for="creditCardExpiryDate">Expiration:</label>
-                <input type="text" id="creditCardExpiryDate" th:field="*{creditCardExpiryDate}" th:classappend="${#fields.hasErrors('creditCardExpiryDate')} ? invalid : valid"/>
+                <input type="text" maxlength="4"id="creditCardExpiryDate" th:field="*{creditCardExpiryDate}" th:classappend="${#fields.hasErrors('creditCardExpiryDate')} ? invalid : valid"/>
             </div>
         </div>
 
@@ -55,7 +55,7 @@
 
             <div class="rightCell">
                 <label for="creditCardCCV">CCV:</label>
-                <input type="text" id="creditCardCCV" th:field="*{creditCardCCV}" th:classappend="${#fields.hasErrors('creditCardCCV')} ? invalid : valid"/>
+                <input type="text" maxlength="3" id="creditCardCCV" th:field="*{creditCardCCV}" th:classappend="${#fields.hasErrors('creditCardCCV')} ? invalid : valid"/>
             </div>
         </div>
 

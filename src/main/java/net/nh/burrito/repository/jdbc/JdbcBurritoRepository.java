@@ -13,7 +13,9 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @Repository
@@ -28,8 +30,9 @@ public class JdbcBurritoRepository implements BurritoRepository {
         this.simpleJdbcInsert = new SimpleJdbcInsert(dataSource).withTableName("burrito").usingGeneratedKeyColumns("id");
     }
 
+    // TODO: Test for this
     @Override
-    public Burrito save(Burrito burrito) {
+    public Burrito create(Burrito burrito) {
         log.info("Saving burrito: {}", burrito);
         long id  = (long) simpleJdbcInsert.executeAndReturnKey(Map.of("name", burrito.getName(), "created_at", new Timestamp(new Date().getTime())));
         log.debug("Created burrito with id: {}", id);
@@ -38,6 +41,27 @@ public class JdbcBurritoRepository implements BurritoRepository {
 
         log.info("Successfully saved burrito: {}", id);
         return burrito.toBuilder().id(id).build();
+    }
+
+    //TODO: implement
+    //TODO: test
+    @Override
+    public boolean update(Burrito order) {
+        return false;
+    }
+
+    //TODO: implement
+    //TODO: test
+    @Override
+    public List<Burrito> findAll() {
+        return null;
+    }
+
+    //TODO: implement
+    //TODO: test
+    @Override
+    public Optional<Burrito> findById() {
+        return Optional.empty();
     }
 
     private void linkIngredientToBurrito(long burritoId, String ingredientId) {

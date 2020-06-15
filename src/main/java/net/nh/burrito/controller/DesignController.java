@@ -63,8 +63,8 @@ public class DesignController implements InitializingBean {
     @PostMapping
     public String submitDesign(Burrito design, @ModelAttribute Order order) {
         log.info("Received design: {} with order: {}", design, order);
-        burritoRepository.save(design);
-        order.getBurritos().add(design);
+        Burrito savedDesign = burritoRepository.create(design);
+        order.getBurritos().add(savedDesign);
         return "redirect:/orders/current";
     }
 

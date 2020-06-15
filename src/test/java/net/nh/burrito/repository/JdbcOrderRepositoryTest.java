@@ -12,7 +12,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -50,13 +49,13 @@ class JdbcOrderRepositoryTest {
     @Test
     void saveOrder_shouldPersistOrderAndBurritoDetails() {
         //GIVEN
-        Burrito burrito = burritoRepository.save(Burrito.builder().name("b1").build());
+        Burrito burrito = burritoRepository.create(Burrito.builder().name("b1").build());
         Long burritoId = burrito.getId();
-        Order order = Order.builder().name("o1").street("s1").town("t1").county("c1").postcode("p1").creditCardNo("ccn1")
+        Order order = Order.builder().orderName("o1").street("s1").town("t1").county("c1").postcode("p1").creditCardNo("ccn1")
                 .creditCardExpiryDate("ced1").creditCardCCV("cv1").burritos(List.of(burrito)).build();
 
         //WHEN
-        Order savedOrder = repository.save(order);
+        Order savedOrder = repository.create(order);
         Long orderId = savedOrder.getId();
 
         //THEN
@@ -73,7 +72,7 @@ class JdbcOrderRepositoryTest {
 
     private void verifyOrder(Long orderId, Order expected, Order actual) {
         assertEquals(orderId, actual.getId());
-        assertEquals(expected.getName(), actual.getName());
+        assertEquals(expected.getOrderName(), actual.getOrderName());
         assertEquals(expected.getStreet(), expected.getStreet());
         assertEquals(expected.getTown(), actual.getTown());
         assertEquals(expected.getCounty(), expected.getCounty());

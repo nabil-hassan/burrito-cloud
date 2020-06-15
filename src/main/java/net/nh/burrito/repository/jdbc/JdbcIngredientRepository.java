@@ -23,12 +23,13 @@ public class JdbcIngredientRepository implements IngredientRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-
+    //TODO: test
     @Override
     public List<Ingredient> findAll() {
         return jdbcTemplate.query("SELECT type, name, id FROM ingredient", this::mapToIngredient);
     }
 
+    // TODO: test
     @Override
     public Optional<Ingredient> findById(String id) {
         SqlParameterSource namedParameters = new MapSqlParameterSource().addValue("id", id);

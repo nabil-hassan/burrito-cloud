@@ -1,6 +1,5 @@
 package net.nh.burrito.repository.jdbc;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import net.nh.burrito.entity.Burrito;
 import net.nh.burrito.entity.Order;
@@ -11,10 +10,10 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.sql.Timestamp;
-import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @Repository
@@ -32,7 +31,7 @@ public class JdbcOrderRepository implements OrderRepository {
     }
 
     @Override
-    public Order save(Order order) {
+    public Order create(Order order) {
         log.info("Create new order: {}", order);
         Map<String, Object> valueMap = orderToValueMap(order);
         long id = (long) insertOrderTemplate.executeAndReturnKey(valueMap);
@@ -42,9 +41,30 @@ public class JdbcOrderRepository implements OrderRepository {
         return order.toBuilder().id(id).build();
     }
 
+    //TODO: implement
+    //TODO: test
+    @Override
+    public boolean update(Order order) {
+        return false;
+    }
+
+    //TODO: implement
+    //TODO: test
+    @Override
+    public List<Order> findAll() {
+        return null;
+    }
+
+    //TODO: implement
+    //TODO: test
+    @Override
+    public Optional<Order> findById() {
+        return Optional.empty();
+    }
+
     private Map<String, Object> orderToValueMap(Order order) {
         Map<String, Object> result = new HashMap<>();
-        result.put("name", order.getName());
+        result.put("name", order.getOrderName());
         result.put("street", order.getStreet());
         result.put("town", order.getTown());
         result.put("county", order.getCounty());

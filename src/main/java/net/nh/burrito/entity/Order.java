@@ -21,7 +21,7 @@ public class Order {
     @Builder.Default
     private List<Burrito> burritos = new ArrayList();
     @NotBlank(message = "Name is mandatory")
-    private String name;
+    private String orderName;
     @NotBlank(message = "Street is mandatory")
     private String street;
     @NotBlank(message = "Town is mandatory")
