@@ -22,13 +22,4 @@ public class Burrito {
     @Builder.Default
     private List<String> ingredients = new ArrayList<>();
 
-    public static void main(String[] args) {
-        Burrito viaBuilder = Burrito.builder().build();
-        assert(viaBuilder.getIngredients() != null && viaBuilder.getIngredients().isEmpty());
-
-        Burrito viaConstructor = new Burrito();
-        viaConstructor.setName("Hi");
-        assert(viaConstructor.getIngredients() != null && viaConstructor.getIngredients().isEmpty());
-    }
-
 }

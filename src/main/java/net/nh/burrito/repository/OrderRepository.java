@@ -10,6 +10,6 @@ public interface OrderRepository {
     Order create(Order order);
     boolean update(Order order);
     List<Order> findAll();
-    Optional<Order> findById();
+    Optional<Order> findById(Long id);
 
 }

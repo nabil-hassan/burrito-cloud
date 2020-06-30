@@ -11,7 +11,7 @@ import static java.lang.Boolean.TRUE;
 public class HomeController {
 
     @GetMapping("/")
-    public String home(@RequestParam("orderComplete") Boolean orderComplete, Model model) {
+    public String home(@RequestParam(name = "orderComplete", required = false) Boolean orderComplete, Model model) {
         if (TRUE.equals(orderComplete)) {
             model.addAttribute("message", "Thanks for your order, see you soon!");
         }

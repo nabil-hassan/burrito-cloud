@@ -4,12 +4,15 @@ import lombok.extern.slf4j.Slf4j;
 import net.nh.burrito.entity.Burrito;
 import net.nh.burrito.entity.Order;
 import net.nh.burrito.repository.OrderRepository;
+import net.nh.burrito.repository.jdbc.translation.OrderMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,12 +25,14 @@ public class JdbcOrderRepository implements OrderRepository {
     private final NamedParameterJdbcTemplate template;
     private final SimpleJdbcInsert insertOrderTemplate;
     private final SimpleJdbcInsert insertOrderBurritoTemplate;
+    private final OrderMapper orderMapper;
 
     @Autowired
-    public JdbcOrderRepository(NamedParameterJdbcTemplate template, DataSource dataSource) {
+    public JdbcOrderRepository(NamedParameterJdbcTemplate template, DataSource dataSource, OrderMapper orderMapper) {
         this.template = template;
         this.insertOrderTemplate = new SimpleJdbcInsert(dataSource).withTableName("orders").usingGeneratedKeyColumns("id");
         this.insertOrderBurritoTemplate = new SimpleJdbcInsert(dataSource).withTableName("order_burritos");
+        this.orderMapper = orderMapper;
     }
 
     @Override
@@ -55,11 +60,15 @@ public class JdbcOrderRepository implements OrderRepository {
         return null;
     }
 
-    //TODO: implement
+    //TODO: change query
     //TODO: test
     @Override
-    public Optional<Order> findById() {
-        return Optional.empty();
+    public Optional<Order> findById(Long id) {
+        return template.queryForObject("SELECT * FROM orders WHERE id = :id", Map.of("id", id), this::mapToOptional);
+    }
+
+    private Optional<Order> mapToOptional(ResultSet rs, int i) throws SQLException {
+        return Optional.ofNullable(orderMapper.mapRow(rs, i));
     }
 
     private Map<String, Object> orderToValueMap(Order order) {
