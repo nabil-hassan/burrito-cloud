@@ -133,4 +133,29 @@ public class JdbcBurritoRepositoryTest {
         verifier.verifyBurritoWasPersistedCorrectly(toUpdate);
     }
 
+    @Test
+    void delete_shouldReturnFalse_whenNoRowExists() {
+        //given:
+        Long unknownId = 202030L;
+
+        //when:
+        boolean deleted = repository.delete(unknownId);
+
+        //then:
+        assertFalse(deleted);
+    }
+
+    @Test
+    void delete_shouldReturnTrue_removeBurritoAndAssociatedIngredients_whenRowExists() {
+        //given:
+        Burrito toDelete = fixture.chickenBurrito();
+
+        //when:
+        boolean deleted = repository.delete(toDelete.getId());
+
+        //then:
+        assertTrue(deleted);
+        verifier.verifyBurritoDoesNotExist(toDelete.getId());
+    }
+
 }

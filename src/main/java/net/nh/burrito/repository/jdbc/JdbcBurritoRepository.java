@@ -11,7 +11,6 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -88,6 +87,18 @@ public class JdbcBurritoRepository implements BurritoRepository {
             jdbcTemplate.update("DELETE FROM burrito_ingredients WHERE burrito_id = :id", Map.of("id", id));
             incoming.getIngredients().forEach(ing -> linkIngredientToBurrito(id, ing));
         }
+        return true;
+    }
+
+    @Override
+    public boolean delete(Long id) {
+        Optional<Burrito> byId = findById(id);
+        if (byId.isEmpty()) {
+            return false;
+        }
+        Map<String, Long> params = Map.of("id", id);
+        jdbcTemplate.update("DELETE FROM burrito_ingredients WHERE burrito_id = :id", params);
+        jdbcTemplate.update("DELETE FROM burrito WHERE id = :id", params);
         return true;
     }
 

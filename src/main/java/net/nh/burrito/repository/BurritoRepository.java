@@ -11,5 +11,6 @@ public interface BurritoRepository {
     List<Burrito> findAll();
     Burrito create(Burrito burrito);
     boolean update(Burrito order);
+    boolean delete(Long id);
 
 }

@@ -57,8 +57,10 @@ public class JdbcRepoTestDataVerifier {
     }
 
     public void verifyBurritoDoesNotExist(Long id) {
-        Long count = namedParamTemplate.query("SELECT count(*) as the_count FROM burrito WHERE id = :id", Map.of("id", id), (rs, i) -> rs.getLong("the_count")).get(0);
-        assertEquals(0, count);
+        Long countBase = namedParamTemplate.query("SELECT count(*) as the_count FROM burrito WHERE id = :id", Map.of("id", id), (rs, i) -> rs.getLong("the_count")).get(0);
+        assertEquals(0, countBase);
+        Long countLinks = namedParamTemplate.query("SELECT count(*) as the_count FROM burrito_ingredients WHERE burrito_id = :id", Map.of("id", id), (rs, i) -> rs.getLong("the_count")).get(0);
+        assertEquals(0, countLinks);
     }
 
     public void verifyBurritoWasPersistedCorrectly(Burrito expected) {
