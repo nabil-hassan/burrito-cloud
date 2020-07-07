@@ -42,14 +42,14 @@ public class JdbcBurritoRepository implements BurritoRepository {
     }
 
     @Override
-    public List<Burrito> findAll() {
-        return jdbcTemplate.query(FIND_ALL_QUERY, rsExtractor);
-    }
-
-    @Override
     public Optional<Burrito> findById(Long id) {
         List<Burrito> results = jdbcTemplate.query(FIND_BY_ID_QUERY, Map.of("burritoId", id), rsExtractor);
         return results != null && results.size() > 0 ? Optional.of(results.get(0)) : Optional.empty();
+    }
+
+    @Override
+    public List<Burrito> findAll() {
+        return jdbcTemplate.query(FIND_ALL_QUERY, rsExtractor);
     }
 
     @Override

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,10 +26,7 @@ import static net.nh.burrito.entity.Ingredient.Type.VEGETABLE;
 @Component
 public class JdbcRepoTestFixture {
 
-    private final SimpleJdbcInsert insertBurritoJdbc;
-    private final SimpleJdbcInsert insertIngredientJdbc;
-    private final SimpleJdbcInsert insertBurritoIngredientsJdbc;
-    private final SimpleJdbcInsert insertOrderJdbc;
+    private final SimpleJdbcInsert insertBurritoJdbc, insertBurritoIngredientsJdbc, insertIngredientJdbc, insertOrderJdbc, insertOrderBurritosJdbc;
     private final JdbcTemplate jdbcTemplate;
     private final ObjectMapper objectMapper;
 
@@ -44,6 +42,7 @@ public class JdbcRepoTestFixture {
         this.insertBurritoIngredientsJdbc = new SimpleJdbcInsert(this.jdbcTemplate).withTableName("burrito_ingredients");
         this.insertIngredientJdbc = new SimpleJdbcInsert(this.jdbcTemplate).withTableName("ingredient");
         this.insertOrderJdbc = new SimpleJdbcInsert(jdbcTemplate).withTableName("orders").usingGeneratedKeyColumns("id");
+        this.insertOrderBurritosJdbc = new SimpleJdbcInsert(jdbcTemplate).withTableName("order_burritos");
     }
 
     public void initialiseData() {
@@ -84,7 +83,22 @@ public class JdbcRepoTestFixture {
         insertBurritoIngredientsJdbc.execute(Map.of("burrito_id", beefBurritoId, "ingredient_id", BEEF.getId()));
         insertBurritoIngredientsJdbc.execute(Map.of("burrito_id", beefBurritoId, "ingredient_id", LETTUCE.getId()));
 
-        //TODO: create example orders
+        //================================================ ORDERS ======================================
+        List<Burrito> chickenOrderBurritos = new ArrayList<>();
+        chickenOrderBurritos.add(CHICKEN_BURRITO);
+        CHICKEN_BURRITO_ORDER = Order.builder().orderName("chicken_order").street("street1").town("town1").county("county1").postcode("postcode1").creditCardNo("12345678")
+                .creditCardExpiryDate("0304").creditCardCCV("670").burritos(chickenOrderBurritos).build();
+        long chickenOrderId = (long) insertOrderJdbc.executeAndReturnKey(orderMap(CHICKEN_BURRITO_ORDER));
+        CHICKEN_BURRITO_ORDER.setId(chickenOrderId);
+        insertOrderBurritosJdbc.execute(Map.of("burrito_id", CHICKEN_BURRITO.getId(),"order_id", CHICKEN_BURRITO_ORDER.getId()));
+
+        List<Burrito> beefOrderBurritos = new ArrayList<>();
+        beefOrderBurritos.add(BEEF_LETTUCE_BURRITO);
+        BEEF_BURRITO_ORDER = Order.builder().orderName("beef_order").street("street2").town("town2").county("county2").postcode("postcode2").creditCardNo("87654321")
+                .creditCardExpiryDate("0405").creditCardCCV("980").burritos(beefOrderBurritos).build();
+        long beefOrderId = (long) insertOrderJdbc.executeAndReturnKey(orderMap(BEEF_BURRITO_ORDER));
+        BEEF_BURRITO_ORDER.setId(beefOrderId);
+        insertOrderBurritosJdbc.execute(Map.of("burrito_id", BEEF_LETTUCE_BURRITO.getId(),"order_id", BEEF_BURRITO_ORDER.getId()));
     }
 
     public Ingredient chicken() {
@@ -111,6 +125,21 @@ public class JdbcRepoTestFixture {
         return BEEF_LETTUCE_BURRITO;
     }
 
+    public Order chickenOrder() {
+        return CHICKEN_BURRITO_ORDER;
+    }
+
+    public Order beefOrder() {
+        return BEEF_BURRITO_ORDER;
+    }
+
+    public List<Order> orders() {
+        List<Order> results = new ArrayList<>();
+        results.add(CHICKEN_BURRITO_ORDER);
+        results.add(BEEF_BURRITO_ORDER);
+        return results;
+    }
+
     public List<Ingredient> ingredients() {
         List<Ingredient> ingredients = new ArrayList<>();
         ingredients.add(BEEF);
@@ -127,4 +156,16 @@ public class JdbcRepoTestFixture {
         return burritos;
     }
 
+    private Map<String, ?> orderMap(Order order) {
+        Map<String, String> result = new HashMap<>();
+        result.put("name", order.getOrderName());
+        result.put("street", order.getStreet());
+        result.put("town", order.getTown());
+        result.put("county", order.getCounty());
+        result.put("postcode", order.getPostcode());
+        result.put("ccNo", order.getCreditCardNo());
+        result.put("ccExpiryDate", order.getCreditCardExpiryDate());
+        result.put("ccCCV", order.getCreditCardCCV());
+        return result;
+    }
 }

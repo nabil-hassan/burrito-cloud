@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.nh.burrito.entity.Burrito;
 import net.nh.burrito.entity.Order;
 import net.nh.burrito.repository.OrderRepository;
-import net.nh.burrito.repository.jdbc.translation.OrderMapper;
+import net.nh.burrito.repository.jdbc.translation.OrderResultSetExtractor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -13,26 +13,47 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
 @Repository
 public class JdbcOrderRepository implements OrderRepository {
 
+    public static final String FIND_ALL_QUERY = "SELECT o.id as order_id, o.name, o.street, o.town, o.county, o.postcode, o.ccno, o.ccexpirydate, o.ccccv, " +
+            "b.id as burrito_id, b.name as burrito_name, i.id as ingredient_id \n" +
+            "FROM orders o\n" +
+            "INNER JOIN order_burritos ob on ob.order_id = o.id\n" +
+            "INNER JOIN burrito b on ob.burrito_id = b.id\n" +
+            "INNER JOIN burrito_ingredients bi ON b.id = bi.burrito_id\n" +
+            "INNER JOIN ingredient i ON i.id = bi.ingredient_id";
+    public static final String FIND_BY_ID_QUERY = FIND_ALL_QUERY + "\n" + "WHERE o.id = :id";
     private final NamedParameterJdbcTemplate template;
     private final SimpleJdbcInsert insertOrderTemplate;
     private final SimpleJdbcInsert insertOrderBurritoTemplate;
-    private final OrderMapper orderMapper;
+    private final OrderResultSetExtractor resultSetExtractor;
 
     @Autowired
-    public JdbcOrderRepository(NamedParameterJdbcTemplate template, DataSource dataSource, OrderMapper orderMapper) {
+    public JdbcOrderRepository(NamedParameterJdbcTemplate template, DataSource dataSource, OrderResultSetExtractor resultSetExtractor) {
         this.template = template;
         this.insertOrderTemplate = new SimpleJdbcInsert(dataSource).withTableName("orders").usingGeneratedKeyColumns("id");
         this.insertOrderBurritoTemplate = new SimpleJdbcInsert(dataSource).withTableName("order_burritos");
-        this.orderMapper = orderMapper;
+        this.resultSetExtractor = resultSetExtractor;
+    }
+
+    @Override
+    public Optional<Order> findById(Long id) {
+        List<Order> results = template.query(FIND_BY_ID_QUERY, Map.of("id", id), resultSetExtractor);
+        return results != null && results.size() > 0 ? Optional.of(results.get(0)) : Optional.empty();
+    }
+
+    @Override
+    public List<Order> findAll() {
+        return template.query(FIND_ALL_QUERY, resultSetExtractor);
     }
 
     @Override
@@ -46,30 +67,47 @@ public class JdbcOrderRepository implements OrderRepository {
         return order.toBuilder().id(id).build();
     }
 
-    //TODO: implement
-    //TODO: test
     @Override
-    public boolean update(Order order) {
-        return false;
+    public boolean update(Order incoming) {
+        Long id = incoming.getId();
+        Objects.requireNonNull(id, "ID is mandatory");
+
+        Optional<Order> existingOpt = findById(id);
+        if (existingOpt.isEmpty()) {
+            return false;
+        }
+
+
+//        Burrito existing = existingOpt.get();
+//
+//        Map<String, ?> updateParams = Map.of("id", id, "name", incoming.getName());
+//        jdbcTemplate.update("UPDATE burrito SET name = :name WHERE id = :id", updateParams);
+//
+//        List<String> existingIngredients = new ArrayList<>(existing.getIngredients());
+//        existingIngredients.sort(String::compareTo);
+//
+//        List<String> incomingIngredients = new ArrayList<>(incoming.getIngredients());
+//        incomingIngredients.sort(String::compareTo);
+//        if (!existingIngredients.equals(incomingIngredients)) {
+//            jdbcTemplate.update("DELETE FROM burrito_ingredients WHERE burrito_id = :id", Map.of("id", id));
+//            incoming.getIngredients().forEach(ing -> linkIngredientToBurrito(id, ing));
+//        }
+        return true;
     }
 
-    //TODO: implement
-    //TODO: test
+    // TODO: implement
     @Override
-    public List<Order> findAll() {
-        return null;
+    public boolean delete(Long id) {
+        Optional<Order> byId = findById(id);
+        if (byId.isEmpty()) {
+            return false;
+        }
+        Map<String, Long> params = Map.of("id", id);
+        template.update("DELETE FROM order_burritos WHERE order_id = :id", params);
+        template.update("DELETE FROM orders WHERE id = :id", params);
+        return true;
     }
 
-    //TODO: change query
-    //TODO: test
-    @Override
-    public Optional<Order> findById(Long id) {
-        return template.queryForObject("SELECT * FROM orders WHERE id = :id", Map.of("id", id), this::mapToOptional);
-    }
-
-    private Optional<Order> mapToOptional(ResultSet rs, int i) throws SQLException {
-        return Optional.ofNullable(orderMapper.mapRow(rs, i));
-    }
 
     private Map<String, Object> orderToValueMap(Order order) {
         Map<String, Object> result = new HashMap<>();
