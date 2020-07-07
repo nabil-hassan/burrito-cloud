@@ -119,16 +119,26 @@ class JdbcOrderRepositoryTest {
     @Test
     void update_shouldUpdateBaseDetails_andAssociatedIngredients() {
         //given:
-//        Burrito toUpdate = fixture.beefLettuceBurrito();
-//        toUpdate.setName("new_name");
-//        toUpdate.setIngredients(List.of(fixture.chicken().getId()));
+        Order toUpdate = fixture.chickenOrder();
+        toUpdate.setOrderName("new-" + toUpdate.getOrderName());
+        toUpdate.setStreet("new-" + toUpdate.getStreet());
+        toUpdate.setTown("new-" + toUpdate.getTown());
+        toUpdate.setCounty("new-" + toUpdate.getCounty());
+        toUpdate.setPostcode("XXX");
+        toUpdate.setCreditCardNo("209080");
+        toUpdate.setCreditCardCCV("568");
+        toUpdate.setCreditCardExpiryDate("9999");
+
+        Burrito chickenBurritoShell = Burrito.builder().id(fixture.chickenBurrito().getId()).build(); // only need to pass id to do the magic
+        Burrito beefBurritoShell = Burrito.builder().id(fixture.beefLettuceBurrito().getId()).build();
+        toUpdate.setBurritos(List.of(chickenBurritoShell, beefBurritoShell));
 
         //when:
-//        boolean updated = repository.update(toUpdate);
+        boolean updated = repository.update(toUpdate);
 
         //then:
-//        assertTrue(updated);
-//        verifier.verifyBurritoWasPersistedCorrectly(toUpdate);
+        assertTrue(updated);
+        verifier.verifyOrderWasPersistedCorrectly(toUpdate);
     }
 
     @Test

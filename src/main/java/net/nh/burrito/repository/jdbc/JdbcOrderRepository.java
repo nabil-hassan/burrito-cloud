@@ -14,11 +14,14 @@ import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.LongSupplier;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Repository
@@ -71,31 +74,36 @@ public class JdbcOrderRepository implements OrderRepository {
     public boolean update(Order incoming) {
         Long id = incoming.getId();
         Objects.requireNonNull(id, "ID is mandatory");
-
         Optional<Order> existingOpt = findById(id);
         if (existingOpt.isEmpty()) {
             return false;
         }
 
+        Map<String, Object> updateParams = new HashMap<>();
+        updateParams.put("id", incoming.getId());
+        updateParams.put("name", incoming.getOrderName());
+        updateParams.put("street", incoming.getStreet());
+        updateParams.put("town", incoming.getTown());
+        updateParams.put("county", incoming.getCounty());
+        updateParams.put("postcode", incoming.getPostcode());
+        updateParams.put("ccNo", incoming.getCreditCardNo());
+        updateParams.put("ccExpiryDate", incoming.getCreditCardExpiryDate());
+        updateParams.put("ccCCV", incoming.getCreditCardCCV());
+        template.update("UPDATE orders SET name = :name, street = :street, town = :town, county = :county, postcode = :postcode, " +
+                "ccNo = :ccNo, ccExpiryDate = :ccExpiryDate, ccCCV = :ccCCV WHERE id = :id", updateParams);
 
-//        Burrito existing = existingOpt.get();
-//
-//        Map<String, ?> updateParams = Map.of("id", id, "name", incoming.getName());
-//        jdbcTemplate.update("UPDATE burrito SET name = :name WHERE id = :id", updateParams);
-//
-//        List<String> existingIngredients = new ArrayList<>(existing.getIngredients());
-//        existingIngredients.sort(String::compareTo);
-//
-//        List<String> incomingIngredients = new ArrayList<>(incoming.getIngredients());
-//        incomingIngredients.sort(String::compareTo);
-//        if (!existingIngredients.equals(incomingIngredients)) {
-//            jdbcTemplate.update("DELETE FROM burrito_ingredients WHERE burrito_id = :id", Map.of("id", id));
-//            incoming.getIngredients().forEach(ing -> linkIngredientToBurrito(id, ing));
-//        }
+        Order existing = existingOpt.get();
+        List<Long> existingBurritoIds = existing.getBurritos().stream().map(Burrito::getId).sorted().collect(Collectors.toList());
+        List<Long> newBurritoIds = incoming.getBurritos().stream().map(Burrito::getId).sorted().collect(Collectors.toList());
+        if (!existingBurritoIds.equals(newBurritoIds)) {
+            template.update("DELETE FROM order_burritos WHERE order_id = :id", Map.of("id", id));
+            newBurritoIds.forEach(burId -> {
+                template.update("INSERT INTO order_burritos(order_id, burrito_id) VALUES(:orderId, :burritoId)", Map.of("orderId", incoming.getId(), "burritoId", burId));
+            });
+        }
         return true;
     }
 
-    // TODO: implement
     @Override
     public boolean delete(Long id) {
         Optional<Order> byId = findById(id);
