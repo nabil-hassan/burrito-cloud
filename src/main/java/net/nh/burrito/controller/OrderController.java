@@ -1,7 +1,7 @@
 package net.nh.burrito.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import net.nh.burrito.entity.Order;
+import net.nh.burrito.entity.jdbc.OrderJDBC;
 import net.nh.burrito.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -34,13 +34,13 @@ public class OrderController {
     }
 
     @PostMapping
-    public String submitOrder(@Valid Order order, Errors errors, SessionStatus sessionStatus, Model model) {
+    public String submitOrder(@Valid OrderJDBC order, Errors errors, SessionStatus sessionStatus, Model model) {
         log.info("Received order: {}", order);
         if (errors.hasErrors()) {
             log.info("Received order has errors: {}", errors.getFieldErrors());
             return "order-form";
         }
-        Order saved = orderRepository.create(order);
+        OrderJDBC saved = orderRepository.create(order);
         log.info("Order: {} saved successfully", saved.getId());
         sessionStatus.setComplete();
         model.addAttribute("message", "Your order has been processed successfully. See you soon!");

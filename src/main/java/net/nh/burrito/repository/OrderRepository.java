@@ -1,14 +1,14 @@
 package net.nh.burrito.repository;
 
-import net.nh.burrito.entity.Order;
+import net.nh.burrito.entity.jdbc.OrderJDBC;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface OrderRepository {
-    Optional<Order> findById(Long id);
-    List<Order> findAll();
-    Order create(Order order);
-    boolean update(Order order);
+    Optional<OrderJDBC> findById(Long id);
+    List<OrderJDBC> findAll();
+    OrderJDBC create(OrderJDBC order);
+    boolean update(OrderJDBC order);
     boolean delete(Long id);
 }

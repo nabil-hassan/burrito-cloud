@@ -1,8 +1,8 @@
 package net.nh.burrito.repository.jdbc;
 
 import lombok.extern.slf4j.Slf4j;
-import net.nh.burrito.entity.Burrito;
-import net.nh.burrito.entity.Order;
+import net.nh.burrito.entity.jdbc.BurritoJDBC;
+import net.nh.burrito.entity.jdbc.OrderJDBC;
 import net.nh.burrito.repository.OrderRepository;
 import net.nh.burrito.repository.jdbc.translation.OrderResultSetExtractor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,21 +11,16 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.LongSupplier;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Repository
-public class JdbcOrderRepository implements OrderRepository {
+public class OrderRepositoryJDBC implements OrderRepository {
 
     public static final String FIND_ALL_QUERY = "SELECT o.id as order_id, o.name, o.street, o.town, o.county, o.postcode, o.ccno, o.ccexpirydate, o.ccccv, " +
             "b.id as burrito_id, b.name as burrito_name, i.id as ingredient_id \n" +
@@ -41,7 +36,7 @@ public class JdbcOrderRepository implements OrderRepository {
     private final OrderResultSetExtractor resultSetExtractor;
 
     @Autowired
-    public JdbcOrderRepository(NamedParameterJdbcTemplate template, DataSource dataSource, OrderResultSetExtractor resultSetExtractor) {
+    public OrderRepositoryJDBC(NamedParameterJdbcTemplate template, DataSource dataSource, OrderResultSetExtractor resultSetExtractor) {
         this.template = template;
         this.insertOrderTemplate = new SimpleJdbcInsert(dataSource).withTableName("orders").usingGeneratedKeyColumns("id");
         this.insertOrderBurritoTemplate = new SimpleJdbcInsert(dataSource).withTableName("order_burritos");
@@ -49,32 +44,32 @@ public class JdbcOrderRepository implements OrderRepository {
     }
 
     @Override
-    public Optional<Order> findById(Long id) {
-        List<Order> results = template.query(FIND_BY_ID_QUERY, Map.of("id", id), resultSetExtractor);
+    public Optional<OrderJDBC> findById(Long id) {
+        List<OrderJDBC> results = template.query(FIND_BY_ID_QUERY, Map.of("id", id), resultSetExtractor);
         return results != null && results.size() > 0 ? Optional.of(results.get(0)) : Optional.empty();
     }
 
     @Override
-    public List<Order> findAll() {
+    public List<OrderJDBC> findAll() {
         return template.query(FIND_ALL_QUERY, resultSetExtractor);
     }
 
     @Override
-    public Order create(Order order) {
+    public OrderJDBC create(OrderJDBC order) {
         log.info("Create new order: {}", order);
         Map<String, Object> valueMap = orderToValueMap(order);
         long id = (long) insertOrderTemplate.executeAndReturnKey(valueMap);
-        for (Burrito burrito : order.getBurritos()) {
+        for (BurritoJDBC burrito : order.getBurritos()) {
             insertOrderBurritoTemplate.execute(Map.of("order_id", id, "burrito_id", burrito.getId()));
         }
         return order.toBuilder().id(id).build();
     }
 
     @Override
-    public boolean update(Order incoming) {
+    public boolean update(OrderJDBC incoming) {
         Long id = incoming.getId();
         Objects.requireNonNull(id, "ID is mandatory");
-        Optional<Order> existingOpt = findById(id);
+        Optional<OrderJDBC> existingOpt = findById(id);
         if (existingOpt.isEmpty()) {
             return false;
         }
@@ -92,9 +87,9 @@ public class JdbcOrderRepository implements OrderRepository {
         template.update("UPDATE orders SET name = :name, street = :street, town = :town, county = :county, postcode = :postcode, " +
                 "ccNo = :ccNo, ccExpiryDate = :ccExpiryDate, ccCCV = :ccCCV WHERE id = :id", updateParams);
 
-        Order existing = existingOpt.get();
-        List<Long> existingBurritoIds = existing.getBurritos().stream().map(Burrito::getId).sorted().collect(Collectors.toList());
-        List<Long> newBurritoIds = incoming.getBurritos().stream().map(Burrito::getId).sorted().collect(Collectors.toList());
+        OrderJDBC existing = existingOpt.get();
+        List<Long> existingBurritoIds = existing.getBurritos().stream().map(BurritoJDBC::getId).sorted().collect(Collectors.toList());
+        List<Long> newBurritoIds = incoming.getBurritos().stream().map(BurritoJDBC::getId).sorted().collect(Collectors.toList());
         if (!existingBurritoIds.equals(newBurritoIds)) {
             template.update("DELETE FROM order_burritos WHERE order_id = :id", Map.of("id", id));
             newBurritoIds.forEach(burId -> {
@@ -106,7 +101,7 @@ public class JdbcOrderRepository implements OrderRepository {
 
     @Override
     public boolean delete(Long id) {
-        Optional<Order> byId = findById(id);
+        Optional<OrderJDBC> byId = findById(id);
         if (byId.isEmpty()) {
             return false;
         }
@@ -117,7 +112,7 @@ public class JdbcOrderRepository implements OrderRepository {
     }
 
 
-    private Map<String, Object> orderToValueMap(Order order) {
+    private Map<String, Object> orderToValueMap(OrderJDBC order) {
         Map<String, Object> result = new HashMap<>();
         result.put("name", order.getOrderName());
         result.put("street", order.getStreet());

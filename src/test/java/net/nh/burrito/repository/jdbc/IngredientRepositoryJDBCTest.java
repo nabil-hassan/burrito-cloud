@@ -1,7 +1,8 @@
 package net.nh.burrito.repository.jdbc;
 
 import lombok.extern.slf4j.Slf4j;
-import net.nh.burrito.entity.Ingredient;
+import net.nh.burrito.entity.jdbc.IngredientJDBC;
+import net.nh.burrito.repository.JDBCRepositoryTestDataVerifier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,15 +19,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ExtendWith(SpringExtension.class)
 @Slf4j
 @SpringBootTest
-public class JdbcIngredientRepositoryTest {
+public class IngredientRepositoryJDBCTest {
 
-    private final JdbcIngredientRepository repository;
+    private final IngredientRepositoryJDBC repository;
     private final JdbcRepoTestFixture fixture;
-    private final JdbcRepoTestDataVerifier dataVerifier;
+    private final JDBCRepositoryTestDataVerifier dataVerifier;
 
     @Autowired
-    public JdbcIngredientRepositoryTest(JdbcIngredientRepository repository, JdbcRepoTestFixture fixture,
-                                        JdbcRepoTestDataVerifier dataVerifier) {
+    public IngredientRepositoryJDBCTest(IngredientRepositoryJDBC repository, JdbcRepoTestFixture fixture,
+                                        JDBCRepositoryTestDataVerifier dataVerifier) {
         this.repository = repository;
         this.fixture = fixture;
         this.dataVerifier = dataVerifier;
@@ -43,7 +44,7 @@ public class JdbcIngredientRepositoryTest {
         String invalidId = "THIS_NOT_EXIST";
 
         //when:
-        Optional<Ingredient> resultOpt = repository.findById(invalidId);
+        Optional<IngredientJDBC> resultOpt = repository.findById(invalidId);
 
         //then:
         assertTrue(resultOpt.isEmpty());
@@ -52,10 +53,10 @@ public class JdbcIngredientRepositoryTest {
     @Test
     void findById_shouldReturnCorrectIngredient_whenIngredientExists() {
         //given:
-        Ingredient expected = fixture.lettuce();
+        IngredientJDBC expected = fixture.lettuce();
 
         //when:
-        Optional<Ingredient> resultOpt = repository.findById(expected.getId());
+        Optional<IngredientJDBC> resultOpt = repository.findById(expected.getId());
 
         //then:
         assertTrue(resultOpt.isPresent());
@@ -65,10 +66,10 @@ public class JdbcIngredientRepositoryTest {
     @Test
     void findAll_shouldReturnAllPersistedIngredients() {
         //given:
-        List<Ingredient> expected = fixture.ingredients();
+        List<IngredientJDBC> expected = fixture.ingredients();
 
         //when:
-        List<Ingredient> results = repository.findAll();
+        List<IngredientJDBC> results = repository.findAll();
 
         //then:
         dataVerifier.verifyIngredients(expected, results);

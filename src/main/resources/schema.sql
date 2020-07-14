@@ -41,7 +41,8 @@ create table if not exists orders (
     postcode      varchar(10) not null,
     ccNo          varchar(12) not null,
     ccExpiryDate  varchar(5)  not null,
-    ccCCV         varchar(3)  not null
+    ccCCV         varchar(3)  not null,
+    placedAt      timestamp
 );
 
 create table if not exists order_burritos (

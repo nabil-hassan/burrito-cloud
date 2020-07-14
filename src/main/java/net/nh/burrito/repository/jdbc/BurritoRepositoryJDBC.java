@@ -1,7 +1,7 @@
 package net.nh.burrito.repository.jdbc;
 
 import lombok.extern.slf4j.Slf4j;
-import net.nh.burrito.entity.Burrito;
+import net.nh.burrito.entity.jdbc.BurritoJDBC;
 import net.nh.burrito.repository.BurritoRepository;
 import net.nh.burrito.repository.jdbc.translation.BurritoResultSetExtractor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ import java.util.Optional;
 
 @Slf4j
 @Repository
-public class JdbcBurritoRepository implements BurritoRepository {
+public class BurritoRepositoryJDBC implements BurritoRepository {
 
     private static final String FIND_ALL_QUERY = "SELECT b.id as burrito_id, b.name as burrito_name, " +
             "i.id as ingredient_id, i.name as ingredient_name, i.type as ingredient_type\n" +
@@ -35,25 +35,25 @@ public class JdbcBurritoRepository implements BurritoRepository {
     private final BurritoResultSetExtractor rsExtractor;
 
     @Autowired
-    public JdbcBurritoRepository(NamedParameterJdbcTemplate jdbcTemplate, DataSource dataSource, BurritoResultSetExtractor rsExtractor) {
+    public BurritoRepositoryJDBC(NamedParameterJdbcTemplate jdbcTemplate, DataSource dataSource, BurritoResultSetExtractor rsExtractor) {
         this.jdbcTemplate = jdbcTemplate;
         this.simpleJdbcInsert = new SimpleJdbcInsert(dataSource).withTableName("burrito").usingGeneratedKeyColumns("id");
         this.rsExtractor = rsExtractor;
     }
 
     @Override
-    public Optional<Burrito> findById(Long id) {
-        List<Burrito> results = jdbcTemplate.query(FIND_BY_ID_QUERY, Map.of("burritoId", id), rsExtractor);
+    public Optional<BurritoJDBC> findById(Long id) {
+        List<BurritoJDBC> results = jdbcTemplate.query(FIND_BY_ID_QUERY, Map.of("burritoId", id), rsExtractor);
         return results != null && results.size() > 0 ? Optional.of(results.get(0)) : Optional.empty();
     }
 
     @Override
-    public List<Burrito> findAll() {
+    public List<BurritoJDBC> findAll() {
         return jdbcTemplate.query(FIND_ALL_QUERY, rsExtractor);
     }
 
     @Override
-    public Burrito create(Burrito burrito) {
+    public BurritoJDBC create(BurritoJDBC burrito) {
         log.info("Saving burrito: {}", burrito);
         long id  = (long) simpleJdbcInsert.executeAndReturnKey(Map.of("name", burrito.getName(), "created_at", new Timestamp(new Date().getTime())));
         log.debug("Created burrito with id: {}", id);
@@ -65,15 +65,15 @@ public class JdbcBurritoRepository implements BurritoRepository {
     }
 
     @Override
-    public boolean update(Burrito incoming) {
+    public boolean update(BurritoJDBC incoming) {
         Long id = incoming.getId();
         Objects.requireNonNull(id, "ID is mandatory");
 
-        Optional<Burrito> existingOpt = findById(id);
+        Optional<BurritoJDBC> existingOpt = findById(id);
         if (existingOpt.isEmpty()) {
             return false;
         }
-        Burrito existing = existingOpt.get();
+        BurritoJDBC existing = existingOpt.get();
 
         Map<String, ?> updateParams = Map.of("id", id, "name", incoming.getName());
         jdbcTemplate.update("UPDATE burrito SET name = :name WHERE id = :id", updateParams);
@@ -92,7 +92,7 @@ public class JdbcBurritoRepository implements BurritoRepository {
 
     @Override
     public boolean delete(Long id) {
-        Optional<Burrito> byId = findById(id);
+        Optional<BurritoJDBC> byId = findById(id);
         if (byId.isEmpty()) {
             return false;
         }

@@ -1,9 +1,9 @@
 package net.nh.burrito.repository.jdbc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.nh.burrito.entity.Burrito;
-import net.nh.burrito.entity.Ingredient;
-import net.nh.burrito.entity.Order;
+import net.nh.burrito.entity.jdbc.BurritoJDBC;
+import net.nh.burrito.entity.jdbc.IngredientJDBC;
+import net.nh.burrito.entity.jdbc.OrderJDBC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -16,9 +16,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static net.nh.burrito.entity.Ingredient.Type.MEAT;
-import static net.nh.burrito.entity.Ingredient.Type.SAUCE;
-import static net.nh.burrito.entity.Ingredient.Type.VEGETABLE;
+import static net.nh.burrito.entity.jdbc.IngredientJDBC.Type.MEAT;
+import static net.nh.burrito.entity.jdbc.IngredientJDBC.Type.SAUCE;
+import static net.nh.burrito.entity.jdbc.IngredientJDBC.Type.VEGETABLE;
 
 /**
  * Used to setup example data for the repository tests.
@@ -30,9 +30,9 @@ public class JdbcRepoTestFixture {
     private final JdbcTemplate jdbcTemplate;
     private final ObjectMapper objectMapper;
 
-    private Ingredient CHICKEN, BEEF, LETTUCE, SALSA;
-    private Burrito CHICKEN_BURRITO, BEEF_LETTUCE_BURRITO;
-    private Order CHICKEN_BURRITO_ORDER, BEEF_BURRITO_ORDER;
+    private IngredientJDBC CHICKEN, BEEF, LETTUCE, SALSA;
+    private BurritoJDBC CHICKEN_BURRITO, BEEF_LETTUCE_BURRITO, UNATTACHED_BURRITO;
+    private OrderJDBC CHICKEN_BURRITO_ORDER, BEEF_BURRITO_ORDER;
 
     @Autowired
     public JdbcRepoTestFixture(JdbcTemplate jdbcTemplate, ObjectMapper objectMapper) {
@@ -53,95 +53,107 @@ public class JdbcRepoTestFixture {
         jdbcTemplate.update("DELETE FROM orders");
 
         //================================================ Ingredients ======================================
-        CHICKEN = Ingredient.builder().id("CHCK").name("Chicken").type(MEAT).build();
+        CHICKEN = IngredientJDBC.builder().id("CHCK").name("Chicken").type(MEAT).build();
         insertIngredientJdbc.execute(objectMapper.convertValue(CHICKEN, Map.class));
 
-        BEEF = Ingredient.builder().id("BEEF").name("Beef").type(MEAT).build();
+        BEEF = IngredientJDBC.builder().id("BEEF").name("Beef").type(MEAT).build();
         insertIngredientJdbc.execute(objectMapper.convertValue(BEEF, Map.class));
 
-        LETTUCE = Ingredient.builder().id("LTTE").name("Lettuce").type(VEGETABLE).build();
+        LETTUCE = IngredientJDBC.builder().id("LTTE").name("Lettuce").type(VEGETABLE).build();
         insertIngredientJdbc.execute(objectMapper.convertValue(LETTUCE, Map.class));
 
-        SALSA = Ingredient.builder().id("SLSA").name("Salsa").type(SAUCE).build();
+        SALSA = IngredientJDBC.builder().id("SLSA").name("Salsa").type(SAUCE).build();
         insertIngredientJdbc.execute(objectMapper.convertValue(SALSA, Map.class));
 
         //================================================ BURRITOS ======================================
         List<String> chickenBurritoIngredients = new ArrayList<>();
         chickenBurritoIngredients.add(CHICKEN.getId());
-        CHICKEN_BURRITO = Burrito.builder().name("chicken_burrito").ingredients(chickenBurritoIngredients).build();
-        long chickenBurritoId  = (long) insertBurritoJdbc.executeAndReturnKey(Map.of("name", CHICKEN_BURRITO.getName(), "created_at", new Timestamp(new Date().getTime())));
+        CHICKEN_BURRITO = BurritoJDBC.builder().name("chicken_burrito").ingredients(chickenBurritoIngredients).build();
+        Date chickenDate = new Date();
+        long chickenBurritoId  = (long) insertBurritoJdbc.executeAndReturnKey(Map.of("name", CHICKEN_BURRITO.getName(), "created_at", new Timestamp(chickenDate.getTime())));
         CHICKEN_BURRITO.setId(chickenBurritoId);
+        CHICKEN_BURRITO.setCreatedAt(chickenDate);
         insertBurritoIngredientsJdbc.execute(Map.of("burrito_id", chickenBurritoId, "ingredient_id", CHICKEN.getId()));
 
         List<String> beefBurritoIngredients = new ArrayList<>();
         beefBurritoIngredients.add(BEEF.getId());
         beefBurritoIngredients.add(LETTUCE.getId());
-        BEEF_LETTUCE_BURRITO = Burrito.builder().name("beef_burrito").build();
+        BEEF_LETTUCE_BURRITO = BurritoJDBC.builder().name("beef_burrito").build();
         BEEF_LETTUCE_BURRITO.setIngredients(beefBurritoIngredients);
-        long beefBurritoId  = (long) insertBurritoJdbc.executeAndReturnKey(Map.of("name", BEEF_LETTUCE_BURRITO.getName(), "created_at", new Timestamp(new Date().getTime())));
+        Date beefDate = new Date();
+        long beefBurritoId  = (long) insertBurritoJdbc.executeAndReturnKey(Map.of("name", BEEF_LETTUCE_BURRITO.getName(), "created_at", new Timestamp(beefDate.getTime())));
         BEEF_LETTUCE_BURRITO.setId(beefBurritoId);
+        BEEF_LETTUCE_BURRITO.setCreatedAt(beefDate);
         insertBurritoIngredientsJdbc.execute(Map.of("burrito_id", beefBurritoId, "ingredient_id", BEEF.getId()));
         insertBurritoIngredientsJdbc.execute(Map.of("burrito_id", beefBurritoId, "ingredient_id", LETTUCE.getId()));
 
+        UNATTACHED_BURRITO = BurritoJDBC.builder().name("unattached_burrito").build();
+        long unattachedBurritoId  = (long) insertBurritoJdbc.executeAndReturnKey(Map.of("name", UNATTACHED_BURRITO.getName(), "created_at", new Timestamp(new Date().getTime())));
+        UNATTACHED_BURRITO.setId(unattachedBurritoId);
+
         //================================================ ORDERS ======================================
-        List<Burrito> chickenOrderBurritos = new ArrayList<>();
+        List<BurritoJDBC> chickenOrderBurritos = new ArrayList<>();
         chickenOrderBurritos.add(CHICKEN_BURRITO);
-        CHICKEN_BURRITO_ORDER = Order.builder().orderName("chicken_order").street("street1").town("town1").county("county1").postcode("postcode1").creditCardNo("12345678")
+        CHICKEN_BURRITO_ORDER = OrderJDBC.builder().orderName("chicken_order").street("street1").town("town1").county("county1").postcode("postcode1").creditCardNo("12345678")
                 .creditCardExpiryDate("0304").creditCardCCV("670").burritos(chickenOrderBurritos).build();
-        long chickenOrderId = (long) insertOrderJdbc.executeAndReturnKey(orderMap(CHICKEN_BURRITO_ORDER));
+        long chickenOrderId = (long) new SimpleJdbcInsert(jdbcTemplate).withTableName("orders").usingGeneratedKeyColumns("id").executeAndReturnKey(orderMap(CHICKEN_BURRITO_ORDER));
         CHICKEN_BURRITO_ORDER.setId(chickenOrderId);
         insertOrderBurritosJdbc.execute(Map.of("burrito_id", CHICKEN_BURRITO.getId(),"order_id", CHICKEN_BURRITO_ORDER.getId()));
 
-        List<Burrito> beefOrderBurritos = new ArrayList<>();
+        List<BurritoJDBC> beefOrderBurritos = new ArrayList<>();
         beefOrderBurritos.add(BEEF_LETTUCE_BURRITO);
-        BEEF_BURRITO_ORDER = Order.builder().orderName("beef_order").street("street2").town("town2").county("county2").postcode("postcode2").creditCardNo("87654321")
+        BEEF_BURRITO_ORDER = OrderJDBC.builder().orderName("beef_order").street("street2").town("town2").county("county2").postcode("postcode2").creditCardNo("87654321")
                 .creditCardExpiryDate("0405").creditCardCCV("980").burritos(beefOrderBurritos).build();
         long beefOrderId = (long) insertOrderJdbc.executeAndReturnKey(orderMap(BEEF_BURRITO_ORDER));
         BEEF_BURRITO_ORDER.setId(beefOrderId);
         insertOrderBurritosJdbc.execute(Map.of("burrito_id", BEEF_LETTUCE_BURRITO.getId(),"order_id", BEEF_BURRITO_ORDER.getId()));
     }
 
-    public Ingredient chicken() {
+    public IngredientJDBC chicken() {
         return CHICKEN;
     }
 
-    public Ingredient beef() {
+    public IngredientJDBC beef() {
         return BEEF;
     }
 
-    public Ingredient lettuce() {
+    public IngredientJDBC lettuce() {
         return LETTUCE;
     }
 
-    public Ingredient salsa() {
+    public IngredientJDBC salsa() {
         return SALSA;
     }
 
-    public Burrito chickenBurrito() {
+    public BurritoJDBC chickenBurrito() {
         return CHICKEN_BURRITO;
     }
 
-    public Burrito beefLettuceBurrito() {
+    public BurritoJDBC beefLettuceBurrito() {
         return BEEF_LETTUCE_BURRITO;
     }
 
-    public Order chickenOrder() {
+    public OrderJDBC chickenOrder() {
         return CHICKEN_BURRITO_ORDER;
     }
 
-    public Order beefOrder() {
+    public OrderJDBC beefOrder() {
         return BEEF_BURRITO_ORDER;
     }
 
-    public List<Order> orders() {
-        List<Order> results = new ArrayList<>();
+    public BurritoJDBC unattachedBurrito() {
+        return UNATTACHED_BURRITO;
+    }
+
+    public List<OrderJDBC> orders() {
+        List<OrderJDBC> results = new ArrayList<>();
         results.add(CHICKEN_BURRITO_ORDER);
         results.add(BEEF_BURRITO_ORDER);
         return results;
     }
 
-    public List<Ingredient> ingredients() {
-        List<Ingredient> ingredients = new ArrayList<>();
+    public List<IngredientJDBC> ingredients() {
+        List<IngredientJDBC> ingredients = new ArrayList<>();
         ingredients.add(BEEF);
         ingredients.add(CHICKEN);
         ingredients.add(LETTUCE);
@@ -149,14 +161,15 @@ public class JdbcRepoTestFixture {
         return ingredients;
     }
 
-    public List<Burrito> burritos() {
-        List<Burrito> burritos = new ArrayList<>();
+    public List<BurritoJDBC> burritos() {
+        List<BurritoJDBC> burritos = new ArrayList<>();
         burritos.add(BEEF_LETTUCE_BURRITO);
         burritos.add(CHICKEN_BURRITO);
+        burritos.add(UNATTACHED_BURRITO);
         return burritos;
     }
 
-    private Map<String, ?> orderMap(Order order) {
+    private Map<String, ?> orderMap(OrderJDBC order) {
         Map<String, String> result = new HashMap<>();
         result.put("name", order.getOrderName());
         result.put("street", order.getStreet());

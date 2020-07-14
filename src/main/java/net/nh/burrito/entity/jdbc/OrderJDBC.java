@@ -1,14 +1,11 @@
-package net.nh.burrito.entity;
+package net.nh.burrito.entity.jdbc;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,10 +13,10 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class Order {
+public class OrderJDBC {
     private Long id;
     @Builder.Default
-    private List<Burrito> burritos = new ArrayList();
+    private List<BurritoJDBC> burritos = new ArrayList();
     @NotBlank(message = "Name is mandatory")
     private String orderName;
     @NotBlank(message = "Street is mandatory")

@@ -1,9 +1,9 @@
 package net.nh.burrito.repository.jdbc;
 
 import lombok.extern.slf4j.Slf4j;
-import net.nh.burrito.entity.Burrito;
-import net.nh.burrito.entity.Order;
-import org.junit.Assert;
+import net.nh.burrito.entity.jdbc.BurritoJDBC;
+import net.nh.burrito.entity.jdbc.OrderJDBC;
+import net.nh.burrito.repository.JDBCRepositoryTestDataVerifier;
 import org.junit.function.ThrowingRunnable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,14 +23,14 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @Slf4j
-class JdbcOrderRepositoryTest {
+class OrderRepositoryJDBCTest {
 
-    private final JdbcOrderRepository repository;
-    private final JdbcRepoTestDataVerifier verifier;
+    private final OrderRepositoryJDBC repository;
+    private final JDBCRepositoryTestDataVerifier verifier;
     private final JdbcRepoTestFixture fixture;
 
     @Autowired
-    public JdbcOrderRepositoryTest(JdbcOrderRepository repository, JdbcBurritoRepository burritoRepository, JdbcRepoTestDataVerifier verifier, JdbcRepoTestFixture fixture) {
+    public OrderRepositoryJDBCTest(OrderRepositoryJDBC repository, BurritoRepositoryJDBC burritoRepository, JDBCRepositoryTestDataVerifier verifier, JdbcRepoTestFixture fixture) {
         this.repository = repository;
         this.verifier = verifier;
         this.fixture = fixture;
@@ -47,7 +47,7 @@ class JdbcOrderRepositoryTest {
         Long nonExistentId = 1832829L;
 
         //when:
-        Optional<Order> result = repository.findById(nonExistentId);
+        Optional<OrderJDBC> result = repository.findById(nonExistentId);
 
         //then:
         assertTrue(result.isEmpty());
@@ -56,10 +56,10 @@ class JdbcOrderRepositoryTest {
     @Test
     void findById_shouldReturnCorrectBurrito_whenRowExists() {
         //given:
-        Order expected = fixture.chickenOrder();
+        OrderJDBC expected = fixture.chickenOrder();
 
         //when:
-        Optional<Order> resultOpt = repository.findById(expected.getId());
+        Optional<OrderJDBC> resultOpt = repository.findById(expected.getId());
 
         //then:
         assertTrue(resultOpt.isPresent());
@@ -69,10 +69,10 @@ class JdbcOrderRepositoryTest {
     @Test
     void findAll_shouldReturnCorrectResults() {
         //given:
-        List<Order> expected = fixture.orders();
+        List<OrderJDBC> expected = fixture.orders();
 
         //when:
-        List<Order> results = repository.findAll();
+        List<OrderJDBC> results = repository.findAll();
 
         //then:
         verifier.verifyOrders(expected, results);
@@ -81,11 +81,11 @@ class JdbcOrderRepositoryTest {
     @Test
     void create_shouldCreateEntriesForBurritoAndIngredients() {
         //given:
-        Order newOrder = Order.builder().orderName("new_order").street("street1").town("town1").county("county1").postcode("postcode1").creditCardNo("12345678")
+        OrderJDBC newOrder = OrderJDBC.builder().orderName("new_order").street("street1").town("town1").county("county1").postcode("postcode1").creditCardNo("12345678")
                 .creditCardExpiryDate("0304").creditCardCCV("670").burritos(List.of(fixture.chickenBurrito(), fixture.beefLettuceBurrito())).build();
 
         //when:
-        Order persisted = repository.create(newOrder);
+        OrderJDBC persisted = repository.create(newOrder);
 
         //then:
         verifier.verifyOrderWasPersistedCorrectly(persisted);
@@ -94,7 +94,7 @@ class JdbcOrderRepositoryTest {
     @Test
     void update_shouldThrowNullPointerException_whenIDIsNull() {
         //given:
-        Order orderWithNullId = Order.builder().id(null).build();
+        OrderJDBC orderWithNullId = OrderJDBC.builder().id(null).build();
 
         //when:
         ThrowingRunnable invocation = () -> repository.update(orderWithNullId);
@@ -106,7 +106,7 @@ class JdbcOrderRepositoryTest {
     @Test
     void update_shouldReturnFalse_andTakeNoAction_whenBurritoDoesNotExist() {
         //given:
-        Order unknownOrder = Order.builder().id(10290329L).build();
+        OrderJDBC unknownOrder = OrderJDBC.builder().id(10290329L).build();
 
         //when:
         boolean updated = repository.update(unknownOrder);
@@ -119,7 +119,7 @@ class JdbcOrderRepositoryTest {
     @Test
     void update_shouldUpdateBaseDetails_andAssociatedIngredients() {
         //given:
-        Order toUpdate = fixture.chickenOrder();
+        OrderJDBC toUpdate = fixture.chickenOrder();
         toUpdate.setOrderName("new-" + toUpdate.getOrderName());
         toUpdate.setStreet("new-" + toUpdate.getStreet());
         toUpdate.setTown("new-" + toUpdate.getTown());
@@ -129,8 +129,8 @@ class JdbcOrderRepositoryTest {
         toUpdate.setCreditCardCCV("568");
         toUpdate.setCreditCardExpiryDate("9999");
 
-        Burrito chickenBurritoShell = Burrito.builder().id(fixture.chickenBurrito().getId()).build(); // only need to pass id to do the magic
-        Burrito beefBurritoShell = Burrito.builder().id(fixture.beefLettuceBurrito().getId()).build();
+        BurritoJDBC chickenBurritoShell = BurritoJDBC.builder().id(fixture.chickenBurrito().getId()).build(); // only need to pass id to do the magic
+        BurritoJDBC beefBurritoShell = BurritoJDBC.builder().id(fixture.beefLettuceBurrito().getId()).build();
         toUpdate.setBurritos(List.of(chickenBurritoShell, beefBurritoShell));
 
         //when:
@@ -156,7 +156,7 @@ class JdbcOrderRepositoryTest {
     @Test
     void delete_shouldReturnTrue_removeBurritoAndAssociatedIngredients_whenRowExists() {
         //given:
-        Order toDelete = fixture.chickenOrder();
+        OrderJDBC toDelete = fixture.chickenOrder();
 
         //when:
         boolean deleted = repository.delete(toDelete.getId());
