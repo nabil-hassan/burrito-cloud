@@ -2,8 +2,7 @@ package net.nh.burrito.repository.jpa;
 
 
 import net.nh.burrito.entity.jpa.BurritoJPA;
-import net.nh.burrito.entity.jpa.OrderJPA;
-import net.nh.burrito.repository.EntityConverter;
+import net.nh.burrito.translation.EntityConverter;
 import net.nh.burrito.repository.JPARepositoryTestDataVerifier;
 import net.nh.burrito.repository.jdbc.JdbcRepoTestFixture;
 import net.nh.utils.Utils;
@@ -12,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;

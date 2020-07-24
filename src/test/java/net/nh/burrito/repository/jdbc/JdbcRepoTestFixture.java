@@ -16,9 +16,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static net.nh.burrito.entity.jdbc.IngredientJDBC.Type.MEAT;
-import static net.nh.burrito.entity.jdbc.IngredientJDBC.Type.SAUCE;
-import static net.nh.burrito.entity.jdbc.IngredientJDBC.Type.VEGETABLE;
+import static net.nh.burrito.entity.IngredientType.MEAT;
+import static net.nh.burrito.entity.IngredientType.SAUCE;
+import static net.nh.burrito.entity.IngredientType.VEGETABLE;
+
 
 /**
  * Used to setup example data for the repository tests.

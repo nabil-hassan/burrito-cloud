@@ -1,8 +1,8 @@
 package net.nh.burrito.repository.jdbc.translation;
 
+import net.nh.burrito.entity.IngredientType;
 import net.nh.burrito.entity.jdbc.BurritoJDBC;
 import net.nh.burrito.entity.jdbc.IngredientJDBC;
-import net.nh.burrito.entity.jdbc.IngredientJDBC.Type;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
@@ -43,7 +43,7 @@ public class BurritoResultSetExtractor implements ResultSetExtractor<List<Burrit
         String type = rs.getString("ingredient_type");
         return IngredientJDBC.builder().id(id)
                 .name(name)
-                .type(Type.valueOf(type)).build();
+                .type(IngredientType.valueOf(type)).build();
     }
 
     private BurritoJDBC mapToBurrito(ResultSet rs) throws SQLException {

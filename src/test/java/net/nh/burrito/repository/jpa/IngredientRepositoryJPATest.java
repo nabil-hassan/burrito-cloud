@@ -1,8 +1,7 @@
 package net.nh.burrito.repository.jpa;
 
-import net.nh.burrito.entity.jdbc.IngredientJDBC;
 import net.nh.burrito.entity.jpa.IngredientJPA;
-import net.nh.burrito.repository.EntityConverter;
+import net.nh.burrito.translation.EntityConverter;
 import net.nh.burrito.repository.JPARepositoryTestDataVerifier;
 import net.nh.burrito.repository.jdbc.JdbcRepoTestFixture;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,7 +14,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertTrue;

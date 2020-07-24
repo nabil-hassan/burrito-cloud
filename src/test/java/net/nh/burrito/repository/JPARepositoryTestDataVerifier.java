@@ -1,10 +1,9 @@
 package net.nh.burrito.repository;
 
-import lombok.extern.slf4j.Slf4j;
-import net.nh.burrito.entity.jdbc.IngredientJDBC;
 import net.nh.burrito.entity.jpa.BurritoJPA;
 import net.nh.burrito.entity.jpa.IngredientJPA;
 import net.nh.burrito.entity.jpa.OrderJPA;
+import net.nh.burrito.translation.EntityConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;

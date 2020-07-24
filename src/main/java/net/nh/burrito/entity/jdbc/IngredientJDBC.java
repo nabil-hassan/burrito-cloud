@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import net.nh.burrito.entity.IngredientType;
 
 import javax.persistence.Entity;
 
@@ -19,9 +20,5 @@ public class IngredientJDBC {
     private String id, name;
 
     @ToString.Exclude
-    private Type type;
-
-    public enum Type {
-        MEAT, SAUCE, VEGETABLE, WRAP;
-    }
+    private IngredientType type;
 }

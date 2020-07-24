@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import net.nh.burrito.entity.IngredientType;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -29,9 +30,6 @@ public class IngredientJPA {
 
     @ToString.Exclude
     @Enumerated(EnumType.STRING)
-    private Type type;
+    private IngredientType type;
 
-    public enum Type {
-        MEAT, SAUCE, VEGETABLE, WRAP;
-    }
 }

@@ -13,6 +13,9 @@ dependencies {
     compile group: 'com.h2database', name: 'h2', version: h2Version
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: springBootVersion
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc', version: springBootVersion
+//    compile group: 'org.springframework.boot', name : 'spring-boot-starter-security', version: springBootVersion
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-hateoas', version: springBootVersion
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf', version: springBootVersion
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf', version: springBootVersion
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: springBootVersion
     developmentOnly group: 'org.springframework.boot', name: 'spring-boot-devtools', version: springBootVersion
