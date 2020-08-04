@@ -5,6 +5,7 @@ package net.nh.burrito;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.hateoas.client.Traverson;
 
 @SpringBootApplication
 public class ApplicationMain {
